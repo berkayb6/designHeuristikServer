@@ -17,8 +17,8 @@ var User= new Schema({
         unique: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
+        //required: true
     },
     subscription: {
         type: Boolean,

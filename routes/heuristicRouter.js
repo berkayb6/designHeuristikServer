@@ -1,9 +1,9 @@
 const express= require('express');
 const bodyParser= require('body-parser');
-/**
+
 const authenticate= require('../authenticate');
+
 const cors = require('./cors');
-*/
 
 const Heuristics= require('../models/heuristics');
 
@@ -12,19 +12,20 @@ heuristicRouter.use(bodyParser.json());
 
 //------------HEURISTICS------------
 heuristicRouter.route('/')
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 
-
-.get((req,res,next)=>{
+.get(cors.cors, (req,res,next) => {
     Heuristics.find({})
+    .populate('comments.author')
     .then((heuristics) => {
-        res.statusCode= 200;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json(heuristics);
-    }, (err)=> next(err))
+    }, (err) => next(err))
     .catch((err) => next(err));
 })
 
-.post( (req,res,next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req,res,next) => {
     Heuristics.create(req.body)
     .then((heuristic) => {
         console.log('Heuristic Created ', heuristic);
@@ -35,11 +36,11 @@ heuristicRouter.route('/')
     .catch((err) => next(err));
 })
 
-.put((req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /heuristics');
 })
-.delete((req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
     Heuristics.remove({})
     .then((resp) => {
         res.statusCode = 200;
@@ -52,8 +53,11 @@ heuristicRouter.route('/')
 //------------HEURISTIC------------
 
 heuristicRouter.route('/:heuristicId')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+
+.get(cors.cors, (req,res,next) => {
     Heuristics.findById(req.params.heuristicId)
+    .populate('comments.author')
     .then((heuristic) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -61,11 +65,11 @@ heuristicRouter.route('/:heuristicId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post((req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.end('POST operation not supported on /heuristics/'+ req.params.heuristicId);
 })
-.put((req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Heuristics.findByIdAndUpdate(req.params.heuristicId, {
         $set: req.body
     }, { new: true })
@@ -76,7 +80,7 @@ heuristicRouter.route('/:heuristicId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete((req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Heuristics.findByIdAndRemove(req.params.heuristicId)
     .then((resp) => {
         res.statusCode = 200;
@@ -89,8 +93,11 @@ heuristicRouter.route('/:heuristicId')
 //------------COMMENTS------------
 
 heuristicRouter.route('/:heuristicId/comments')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+
+.get(cors.cors, (req,res,next) => {
     Heuristics.findById(req.params.heuristicId)
+    .populate('comments.author')
     .then((heuristic) => {
         if (heuristic != null) {
             res.statusCode = 200;
@@ -105,16 +112,21 @@ heuristicRouter.route('/:heuristicId/comments')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post((req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Heuristics.findById(req.params.heuristicId)
     .then((heuristic) => {
         if (heuristic != null) {
+            req.body.author = req.user._id;
             heuristic.comments.push(req.body);
             heuristic.save()
             .then((heuristic) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(heuristic);                
+                Heuristics.findById(heuristic._id)
+                .populate('comments.author')
+                .then((heuristic) => {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(heuristic);
+                })            
             }, (err) => next(err));
         }
         else {
@@ -125,12 +137,12 @@ heuristicRouter.route('/:heuristicId/comments')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put((req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /Heuristics/'
         + req.params.heuristicId + '/comments');
 })
-.delete((req, res, next) => {
+.delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Heuristics.findById(req.params.heuristicId)
     .then((heuristic) => {
         if (heuristic != null) {
@@ -156,8 +168,11 @@ heuristicRouter.route('/:heuristicId/comments')
 //------------COMMENT------------
 
 heuristicRouter.route('/:heuristicId/comments/:commentId')
-.get((req,res,next) => {
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+
+.get(cors.cors, (req,res,next) => {
     Heuristics.findById(req.params.heuristicId)
+    .populate('comments.author')    
     .then((heuristic) => {
         if (heuristic != null && heuristic.comments.id(req.params.commentId) != null) {
             res.statusCode = 200;
@@ -165,7 +180,7 @@ heuristicRouter.route('/:heuristicId/comments/:commentId')
             res.json(heuristic.comments.id(req.params.commentId));
         }
         else if (heuristic == null) {
-            err = new Error('heuristic ' + req.params.heuristicId + ' not found');
+            err = new Error('Heuristic ' + req.params.heuristicId + ' not found');
             err.status = 404;
             return next(err);
         }
@@ -177,30 +192,40 @@ heuristicRouter.route('/:heuristicId/comments/:commentId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post((req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('POST operation not supported on /Heuristics/'+ req.params.heuristicId
         + '/comments/' + req.params.commentId);
 })
-.put((req, res, next) => {
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Heuristics.findById(req.params.heuristicId)
     .then((heuristic) => {
-        if (heuristic != null && heuristic.comments.id(req.params.commentId) != null) {
+        if (heuristic != null && heuristic.comments.id(req.params.commentId) != null && req.user._id.equals(heuristic.comments.id(req.params.commentId).author)) {
             if (req.body.rating) {
                 heuristic.comments.id(req.params.commentId).rating = req.body.rating;
             }
-            if (req.body.comment) {
+            if (req.body.comment ) {
                 heuristic.comments.id(req.params.commentId).comment = req.body.comment;                
             }
             heuristic.save()
             .then((heuristic) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(heuristic);                
+                Heuristics.findById(heuristic._id)
+                .populate('comments.author')
+                .then((heuristic)=> {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(heuristic);                
+                    
+                })
             }, (err) => next(err));
         }
+        else if (req.user._id.equals(heuristic.comments.id(req.params.commentId).author) == false){
+            err = new Error('You are not authorized to perform this operation!');
+            err.status = 403;
+            return next(err);
+        }
         else if (heuristic == null) {
-            err = new Error('heuristic ' + req.params.heuristicId + ' not found');
+            err = new Error('Heuristic ' + req.params.heuristicId + ' not found');
             err.status = 404;
             return next(err);
         }
@@ -212,20 +237,31 @@ heuristicRouter.route('/:heuristicId/comments/:commentId')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.delete((req, res, next) => {
+
+
+.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Heuristics.findById(req.params.heuristicId)
     .then((heuristic) => {
-        if (heuristic != null && heuristic.comments.id(req.params.commentId) != null) {
+        if (heuristic != null && heuristic.comments.id(req.params.commentId) != null && req.user._id.equals(heuristic.comments.id(req.params.commentId).author)) {
             heuristic.comments.id(req.params.commentId).remove();
             heuristic.save()
             .then((heuristic) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(heuristic);                
+                Heuristics.findById(heuristic._id)
+                .populate('comments.author')
+                .then((heuristic)=> {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(heuristic);                
+                })             
             }, (err) => next(err));
         }
+        else if (req.user._id.equals(heuristic.comments.id(req.params.commentId).author) == false){
+            err = new Error('You are not authorized to perform this operation!');
+            err.status = 403;
+            return next(err);
+        }
         else if (heuristic == null) {
-            err = new Error('heuristic ' + req.params.heuristicId + ' not found');
+            err = new Error('Heuristic ' + req.params.heuristicId + ' not found');
             err.status = 404;
             return next(err);
         }
