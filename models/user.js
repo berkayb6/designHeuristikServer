@@ -27,6 +27,18 @@ var User= new Schema({
     admin: {
         type: Boolean,
         default: false
+    },
+    library: {
+        type: Array,
+        default: []
+    },
+    yourHeuristics: {
+        type: Array,
+        default: []
+    },
+    projects: {
+        type: Array,
+        default: []
     }
 });
 

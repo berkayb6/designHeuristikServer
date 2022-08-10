@@ -7,7 +7,7 @@ var config = require('./config');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var passport= require('passport');
-var authenticat= require('./authenticate');
+var authenticate= require('./authenticate');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -28,6 +28,30 @@ connect.then((db)=>{
 
 var app = express();
 
+app.all('*', (req, res, next)=> {
+  if (req.secure) {
+    return next();
+  }
+  else{
+    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+  }
+});
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "*");
+  //Origin, X-Requested-With, Content-Type, Accept
+  next();
+});
+
+app.get('/', function(req, res, next) {
+  // Handle the get for this route
+});
+
+app.post('/', function(req, res, next) {
+ // Handle the post for this route
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -35,7 +59,6 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 app.use(session({
   name: 'session-id',
@@ -46,8 +69,6 @@ app.use(session({
 }));
 
 app.use(passport.initialize());
-app.use(passport.session());
-
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

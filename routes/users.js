@@ -1,5 +1,5 @@
 var express = require('express');
-var router = express.Router();
+const userRouter = express.Router();
 
 const bodyParser = require('body-parser');
 var User = require('../models/user');
@@ -8,11 +8,11 @@ var authenticate = require('../authenticate');
 const cors = require('./cors');
 var passport= require('passport');
 
-router.use(bodyParser.json());
+userRouter.use(bodyParser.json());
 
-router.options('*', cors.corsWithOptions, (req, res) => { res.sendStatus(200); } )
+userRouter.options('*', cors.corsWithOptions, (req, res) => { res.sendStatus(200); } )
 
-router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   User.find({})
   .then((users) => {
       res.statusCode= 200;
@@ -62,12 +62,15 @@ router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.veri
       return next(err);
 
     if (!user) {
+      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       res.statusCode = 401;
       res.setHeader('Content-Type', 'application/json');
       res.json({success: false, status: 'Login Unsuccessful!', err: info });
+      return next(err);
     }
     req.logIn(user, (err) => {
       if (err){
+        console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json');
         res.json({success: false, status: 'Login Unsuccessful!', err: "Could not log in user" });    
@@ -94,7 +97,7 @@ router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.veri
   }
 });
 
-router.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
+userRouter.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
   passport.authenticate('jwt', {session: false}, (err, user, info) => {
     if (err)
       return next(err);
@@ -113,4 +116,4 @@ router.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
   }) (req, res);
 });
 
-module.exports = router;
+module.exports = userRouter;

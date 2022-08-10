@@ -5,8 +5,8 @@ var commentSchema = new Schema({
     rating:  {
         type: Number,
         min: 1,
-        max: 5,
-        required: true
+        max: 5
+        //required: true
     },
     comment:  {
         type: String,
@@ -64,11 +64,11 @@ var heuristicSchema = new Schema({
         required: true
     },
     image:{
-        type: String,
+        type: Array,
         required: true
     },
     sources:{
-        type: String,
+        type: Array,
         required: true
     },
     comments:[commentSchema]
