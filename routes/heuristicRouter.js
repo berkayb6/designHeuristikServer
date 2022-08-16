@@ -25,7 +25,7 @@ heuristicRouter.route('/')
     .catch((err) => next(err));
 })
 
-.post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req,res,next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser,  (req,res,next) => { //authenticate.verifyAdmin,
     Heuristics.create(req.body)
     .then((heuristic) => {
         console.log('Heuristic Created ', heuristic);

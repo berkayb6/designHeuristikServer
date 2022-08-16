@@ -26,11 +26,11 @@ var heuristicSchema = new Schema({
         required: true
     },
     level: {
-        type: String,
+        type: Array,
         required: true
     },
     industry: {
-        type: String,
+        type: Array,
         required: true
     },
     rating: {
@@ -40,12 +40,12 @@ var heuristicSchema = new Schema({
         required: true
     },
     name: {
-        type: String,
-        required: true
+        type: String
+        //required: true
     },
     title: {
-        type: String,
-        required: true
+        type: String
+        //required: true
     },
     positiveInfluence:{
         type: Array,
@@ -64,8 +64,8 @@ var heuristicSchema = new Schema({
         required: true
     },
     image:{
-        type: Array,
-        required: true
+        type: Array
+        //required: true
     },
     sources:{
         type: Array,
