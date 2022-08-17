@@ -5,34 +5,40 @@ const multer = require('multer');
 var fs = require('fs');
 const Heuristics= require('../models/heuristics');
 
-
+let id;
+var ObjectId = require('mongodb').ObjectId; 
 function findLatestHeuristicId(){
-    let id;
+    console.log("a");
+    let latestHeuristicId;
     return new Promise (resolve=> {
-        Heuristics.find().sort({ createdAt: -1 }).limit(1).then((heuristic)=> {
-            id =  heuristic[0]._id.toString();
-            
-            console.log("findLatestHeuristicId: ", id)
+        console.log("g");
+        Heuristics.find().sort({ createdAt: -1 }).limit(1, console.log("i"))
+        // resolve(heuristic.schema.paths._id);
+        // console.log("heuristic: ",  heuristic.schema.paths._id)
+        .then((heuristic)=> {
+            latestHeuristicId =  heuristic[0]._id;
+            id= latestHeuristicId.valueOf()
+            console.log(latestHeuristicId.valueOf());
+            // setTimeout(() => {
+            //     console.log('This will run after 1 second!')
+            // }, 1000);
             resolve(id);
         });
 
     })
 }
 async function store () {
-    const id = await findLatestHeuristicId();
-    console.log("id: ", typeof id)
-    
-    return id;
-
+    console.log("b");
+    await await findLatestHeuristicId();
+    console.log("e");
 }
 
-let id = store();
-console.log("id2", typeof id)
 const storage =  multer.diskStorage({
 
     destination: (req, file, cb) => {
-        
-        console.log("store: ", id[0])
+        console.log("c");
+        store();
+        console.log("d");
         const path = `public/assets/${id}`
         fs.mkdirSync(path, { recursive: true })
         cb(null, path);

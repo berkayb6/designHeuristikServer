@@ -76,8 +76,22 @@ app.use('/users', usersRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// function waitForHeuristic(){
+//   const result = app.use('/heuristics', heuristicRouter);
+//   return new Promise (resolve=> {
+//       resolve(result);
+//   })
+// }
+
+// let res;
+// async function upload () {
+//   res = await waitForHeuristic();
+//   console.log("result: ", res);
+  
+// }
+
 app.use('/heuristics', heuristicRouter);
-app.use('/imageUpload',uploadRouter);
+app.use('/imageUpload',uploadRouter); 
 app.use('/comments', commentRouter);
 
 // catch 404 and forward to error handler

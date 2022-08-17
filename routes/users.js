@@ -62,7 +62,6 @@ userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.
       return next(err);
 
     if (!user) {
-      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
       res.statusCode = 401;
       res.setHeader('Content-Type', 'application/json');
       res.json({success: false, status: 'Login Unsuccessful!', err: info });
@@ -70,7 +69,6 @@ userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.
     }
     req.logIn(user, (err) => {
       if (err){
-        console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json');
         res.json({success: false, status: 'Login Unsuccessful!', err: "Could not log in user" });    
