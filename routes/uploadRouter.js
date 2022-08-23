@@ -4,47 +4,41 @@ const authenticate = require('../authenticate');
 const multer = require('multer');
 var fs = require('fs');
 const Heuristics= require('../models/heuristics');
+const { v4: uuidv4 } = require('uuid');
 
-let id;
-var ObjectId = require('mongodb').ObjectId; 
-function findLatestHeuristicId(){
-    console.log("a");
+let id, name;
+var ObjectId = require('mongodb').ObjectId;
+function findLatestHeuristicId(name){
     let latestHeuristicId;
     return new Promise (resolve=> {
-        console.log("g");
-        Heuristics.find().sort({ createdAt: -1 }).limit(1, console.log("i"))
-        // resolve(heuristic.schema.paths._id);
-        // console.log("heuristic: ",  heuristic.schema.paths._id)
+        Heuristics.find().sort({ createdAt: -1 }).limit(1)
+       
         .then((heuristic)=> {
             latestHeuristicId =  heuristic[0]._id;
-            id= latestHeuristicId.valueOf()
-            console.log(latestHeuristicId.valueOf());
-            // setTimeout(() => {
-            //     console.log('This will run after 1 second!')
-            // }, 1000);
+            id= latestHeuristicId.valueOf();
+            fs.rename(`public/assets/${name}`, `public/assets/${id}`, (err)=> {
+                if (err) throw err;    
+            })
             resolve(id);
         });
 
     })
 }
-async function store () {
-    console.log("b");
-    await await findLatestHeuristicId();
-    console.log("e");
+
+async function store (name) {
+    await findLatestHeuristicId(name);
 }
 
 const storage =  multer.diskStorage({
 
     destination: (req, file, cb) => {
-        console.log("c");
-        store();
-        console.log("d");
-        const path = `public/assets/${id}`
+        name = uuidv4();
+        const path = `public/assets/${name}`
         fs.mkdirSync(path, { recursive: true })
         cb(null, path);
     },
 
-    filename: (req, file, cb) => {
+    filename: (req, file, cb) => {        
         cb(null, file.originalname)
     }
 });
@@ -68,6 +62,7 @@ uploadRouter.route('/')
     res.end('GET operation not supported on /imageUpload');
 })
 .post( upload.single('imageFile'), (req, res) => {
+    store(name);
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json(req.file);
