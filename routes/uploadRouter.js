@@ -3,26 +3,53 @@ const bodyParser = require('body-parser');
 const authenticate = require('../authenticate');
 const multer = require('multer');
 var fs = require('fs');
+var path = require('path');
+var fsExtra= require('fs-extra');
 const Heuristics= require('../models/heuristics');
 const { v4: uuidv4 } = require('uuid');
 
 let id, name;
-var ObjectId = require('mongodb').ObjectId;
 function findLatestHeuristicId(name){
-    let latestHeuristicId;
     return new Promise (resolve=> {
         Heuristics.find().sort({ createdAt: -1 }).limit(1)
-       
         .then((heuristic)=> {
-            latestHeuristicId =  heuristic[0]._id;
-            id= latestHeuristicId.valueOf();
-            fs.rename(`public/assets/${name}`, `public/assets/${id}`, (err)=> {
-                if (err) throw err;    
-            })
+            id= heuristic[0]._id.valueOf();
+            moveFolderRecursiveSync(`public/assets/${name}`, `public/assets/${id}`)
             resolve(id);
         });
-
     })
+}
+
+function copyFileSync( source, target ) {
+    let targetFile;
+    // If target is a directory, a new file with the same name will be created
+    if ( fs.existsSync( target ) ) {
+        if ( fs.lstatSync( target ).isDirectory() ) {
+            targetFile = path.join( target, path.basename( source ) );
+        }
+    }
+    fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+
+function moveFolderRecursiveSync( source, target ) {
+    var files = [];
+    // Copy
+    if ( !fs.existsSync( target ) ) {
+        fs.mkdirSync( target );
+    }
+
+    if ( fs.lstatSync( source ).isDirectory() ) {
+        files = fs.readdirSync( source );
+        files.forEach( function ( file ) {
+            var curSource = path.join( source, file );
+            if ( fs.lstatSync( curSource ).isDirectory() ) {
+                moveFolderRecursiveSync( curSource, target );
+            } else {
+                copyFileSync( curSource, target );
+            }
+        });
+    }
+    fs.rmSync(source, { recursive: true, force: true });
 }
 
 async function store (name) {
@@ -30,7 +57,6 @@ async function store (name) {
 }
 
 const storage =  multer.diskStorage({
-
     destination: (req, file, cb) => {
         name = uuidv4();
         const path = `public/assets/${name}`
