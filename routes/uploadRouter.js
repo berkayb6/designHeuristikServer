@@ -9,6 +9,8 @@ const Heuristics= require('../models/heuristics');
 const { v4: uuidv4 } = require('uuid');
 
 let id, name;
+var i = 0;
+var nameArray = [];
 function findLatestHeuristicId(name){
     return new Promise (resolve=> {
         Heuristics.find().sort({ createdAt: -1 }).limit(1)
@@ -37,7 +39,6 @@ function moveFolderRecursiveSync( source, target ) {
     if ( !fs.existsSync( target ) ) {
         fs.mkdirSync( target );
     }
-
     if ( fs.lstatSync( source ).isDirectory() ) {
         files = fs.readdirSync( source );
         files.forEach( function ( file ) {
@@ -59,6 +60,8 @@ async function store (name) {
 const storage =  multer.diskStorage({
     destination: (req, file, cb) => {
         name = uuidv4();
+        console.log("name: ", name)
+        nameArray.push(name);
         const path = `public/assets/${name}`
         fs.mkdirSync(path, { recursive: true })
         cb(null, path);
@@ -88,7 +91,10 @@ uploadRouter.route('/')
     res.end('GET operation not supported on /imageUpload');
 })
 .post( upload.single('imageFile'), (req, res) => {
-    store(name);
+    if (nameArray.length!==0){
+        store(nameArray[i]);
+        i++;
+    }
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json(req.file);
