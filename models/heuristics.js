@@ -21,55 +21,52 @@ var commentSchema = new Schema({
 });
 
 var heuristicSchema = new Schema({
-    designfor: {
-        type: String,
-        required: true
-    },
-    level: {
+    designFor: {
         type: Array,
         required: true
-    },
-    industry: {
-        type: Array,
-        required: true
-    },
-    rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-        required: true
-    },
-    name: {
-        type: String
-        //required: true
-    },
-    title: {
-        type: String
-        //required: true
     },
     positiveInfluence:{
         type: Array,
         required: true
     },
-    negativeInfluence:{
+    designPhase: {
         type: Array,
         required: true
     },
-    applicableIndustry:{
-        type: Array,
-        required: true
-    },
-    description:{
+    title: {
         type: String,
         required: true
+    },
+    negativeInfluence:{
+        type: Array
+    },
+    lifeCyclePhase: {
+        type: Array
+    },
+    industry: {
+        type: Array
+    },
+    rating: {
+        type: Number,
+        min: 0,
+        max: 5
+    },
+    name: {
+        type: String
+        //required: true
+    },
+    category: {
+        type: Array  
+    },
+    description:{
+        type: String
     },
     image:{
         type: Array
         //required: true
     },
     sources:{
-        type: Array,
-        required: true
+        type: Array
     },
     comments:[commentSchema]
 }, {
