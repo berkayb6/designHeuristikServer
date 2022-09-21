@@ -30,7 +30,7 @@ var heuristicSchema = new Schema({
         required: true
     },
     designPhase: {
-        type: Array,
+        type: String,
         required: true
     },
     title: {
