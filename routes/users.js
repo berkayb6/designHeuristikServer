@@ -12,7 +12,7 @@ userRouter.use(bodyParser.json());
 
 userRouter.options('*', cors.corsWithOptions, (req, res) => { res.sendStatus(200); } )
 
-userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
   User.find({})
   .then((users) => {
       res.statusCode= 200;
@@ -21,6 +21,8 @@ userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.
   }, (err)=> next(err))
   .catch((err) => next(err))
 })
+
+
 
 .post('/signup', cors.corsWithOptions, (req, res, next) => {
   User.register(new User({username: req.body.username}), 
@@ -113,5 +115,18 @@ userRouter.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
     }
   }) (req, res);
 });
+
+userRouter.route('/:userId')
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
+
+.get(cors.cors, (req,res,next) => {
+    User.findById(req.params.userId)
+    .then((user) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
 
 module.exports = userRouter;
