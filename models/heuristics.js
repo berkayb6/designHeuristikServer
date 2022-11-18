@@ -29,7 +29,7 @@ var heuristicSchema = new Schema({
         type: Array,
         required: true
     },
-    designPhase: {
+    productDimension: {
         type: Array,
         required: true
     },
@@ -40,7 +40,7 @@ var heuristicSchema = new Schema({
     negativeInfluence:{
         type: Array
     },
-    lifeCyclePhase: {
+    phase: {
         type: Array
     },
     industry: {
