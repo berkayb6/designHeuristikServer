@@ -11,6 +11,8 @@ const heuristicRouter= express.Router();
 heuristicRouter.use(bodyParser.json());
 
 //------------HEURISTICS------------
+let shortId;
+
 heuristicRouter.route('/')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 
@@ -25,15 +27,22 @@ heuristicRouter.route('/')
     .catch((err) => next(err));
 })
 
-.post(cors.corsWithOptions, authenticate.verifyUser,  (req,res,next) => { //authenticate.verifyAdmin,
-    Heuristics.create(req.body)
-    .then((heuristic) => {
-        console.log('Heuristic Created ', heuristic);
-        res.statusCode= 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(heuristic);
-    }, (err)=> next(err))
-    .catch((err) => next(err));
+.post(cors.corsWithOptions,   (req,res,next) => { //authenticate.verifyAdmin, authenticate.verifyUser,
+    Heuristics.find().sort({ shortId: -1 }).limit(1)
+        .then((heuristic)=> {
+            shortId= heuristic[0].shortId.valueOf();
+            var reqBody= req.body;
+            reqBody["shortId"]= shortId+1;
+    Heuristics.create(reqBody)
+        .then((heuristic) => {
+            console.log('Heuristic Created ', heuristic);
+            res.statusCode= 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(heuristic);
+        }, (err)=> next(err))
+        .catch((err) => next(err));
+            });
+    
 })
 
 .put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {

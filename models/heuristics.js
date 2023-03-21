@@ -21,6 +21,10 @@ var commentSchema = new Schema({
 });
 
 var heuristicSchema = new Schema({
+    shortId: {
+        type: Number,
+        required: true
+    },
     designFor: {
         type: Array,
         required: true

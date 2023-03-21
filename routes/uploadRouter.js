@@ -7,6 +7,7 @@ var path = require('path');
 var fsExtra= require('fs-extra');
 const Heuristics= require('../models/heuristics');
 const { v4: uuidv4 } = require('uuid');
+const {nanoid}= require('nanoid');
 
 let id, name;
 var i = 0;
@@ -32,7 +33,6 @@ function copyFileSync( source, target ) {
     }
     fs.writeFileSync(targetFile, fs.readFileSync(source));
 }
-
 function moveFolderRecursiveSync( source, target ) {
     var files = [];
     // Copy
