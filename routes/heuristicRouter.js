@@ -30,7 +30,12 @@ heuristicRouter.route('/')
 .post(cors.corsWithOptions,   (req,res,next) => { //authenticate.verifyAdmin, authenticate.verifyUser,
     Heuristics.find().sort({ shortId: -1 }).limit(1)
         .then((heuristic)=> {
-            shortId= heuristic[0].shortId.valueOf();
+            console.log("test: ", heuristic[0]===undefined)
+            if(heuristic[0]=== undefined){
+                shortId=1;
+            }
+            else
+                shortId= heuristic[0].shortId.valueOf();
             var reqBody= req.body;
             reqBody["shortId"]= shortId+1;
     Heuristics.create(reqBody)

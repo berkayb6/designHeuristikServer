@@ -25,26 +25,31 @@ var heuristicSchema = new Schema({
         type: Number,
         required: true
     },
-    designFor: {
-        type: Array,
-        required: true
-    },
-    positiveInfluence:{
-        type: Array,
-        required: true
-    },
-    productDimension: {
-        type: Array,
-        required: true
-    },
     title: {
         type: String,
         required: true
     },
-    negativeInfluence:{
-        type: Array
+    adressedSystemLevel: {
+        type: String,
+        required: true
     },
-    phase: {
+    artefactCategorization: {
+        type: String,
+        required: true
+    },
+    orderCategory: {
+        type: String,
+        required: true
+    },
+    orderCategorySpecification: {
+        type: String,
+        required: true
+    },
+    positiveEffects:{
+        type: Array,
+        required: true
+    },
+    negativeEffects:{
         type: Array
     },
     industry: {
@@ -54,13 +59,6 @@ var heuristicSchema = new Schema({
         type: Number,
         min: 0,
         max: 5
-    },
-    name: {
-        type: String
-        //required: true
-    },
-    category: {
-        type: Array  
     },
     description:{
         type: String
