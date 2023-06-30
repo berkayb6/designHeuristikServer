@@ -29,6 +29,18 @@ var heuristicSchema = new Schema({
         type: String,
         required: true
     },
+    orderArtefact: {
+        type: String
+    },
+    embodimentArtefact: {
+        type: String
+    },
+    embodimentAtrribute: {
+        type: String
+    },
+    orderAttribute: {
+        type: String
+    },
     adressedSystemLevel: {
         type: String,
         required: true

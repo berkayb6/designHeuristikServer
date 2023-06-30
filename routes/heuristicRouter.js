@@ -31,7 +31,7 @@ heuristicRouter.route('/')
     Heuristics.find().sort({ shortId: -1 }).limit(1)
         .then((heuristic)=> {
             if(heuristic[0]=== undefined){
-                shortId=1;
+                shortId=0;
             }
             else
                 shortId= heuristic[0].shortId.valueOf();
