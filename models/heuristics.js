@@ -30,10 +30,12 @@ var heuristicSchema = new Schema({
         required: true
     },
     orderArtefact: {
-        type: String
+        type: String,
+        required: true
     },
     embodimentArtefact: {
-        type: String
+        type: String,
+        required: true
     },
     embodimentAtrribute: {
         type: String
